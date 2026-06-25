@@ -2,8 +2,9 @@
 
 Replaces the deprecated OCP search skill ``ovos-skill-pyradios``. Instead of
 answering ``ovos.common_play.query`` over the bus, this provider is loaded
-in-process by the OCP pipeline, gated by the three-axis routing test, and its
-:meth:`search` is called directly.
+in-process by the OCP pipeline and its :meth:`search` is called directly. The
+provider serves radio stations; any request it cannot satisfy (no query, the
+backend unreachable, …) yields an empty list.
 
 ``pyradios`` is a thin client over the `radio-browser.info
 <https://www.radio-browser.info>`_ HTTP API. It does **not** ship a
@@ -22,7 +23,6 @@ from typing import ClassVar, List, Optional, Set
 from ovos_utils.log import LOG
 
 from mediavocab import MediaType, Release, Signals, Work
-from mediavocab.taxonomy import PlaybackType
 from ovos_plugin_manager.templates.media_provider import MediaProvider
 
 from ovos_media_provider_pyradios.version import __version__  # noqa: F401
@@ -100,18 +100,10 @@ def _station_confidence(station: dict) -> float:
 class PyRadiosMediaProvider(MediaProvider):
     """Search radio-browser.info and return ``mediavocab.Release`` playables.
 
-    Routing (three-axis gate):
-
-    * ``media`` — only ``MediaType.RADIO``.
-    * ``playback_type`` — ``AUDIO`` only (radio is audio-only).
-    * ``genre_filter`` — empty (no genre gate; tags ride on each ``Work``).
+    Serves live-linear radio stations (``MediaType.RADIO``, consumed as audio).
     """
 
     name: ClassVar[str] = "pyradios"
-
-    media: ClassVar[Set[MediaType]] = {MediaType.RADIO}
-
-    playback_type: ClassVar[Set[PlaybackType]] = {PlaybackType.AUDIO}
 
     def __init__(self, config: Optional[dict] = None):
         super().__init__(config)
@@ -128,22 +120,19 @@ class PyRadiosMediaProvider(MediaProvider):
             self._rb = RadioBrowser()
         return self._rb
 
-    def is_available(self) -> bool:
-        """True if ``pyradios`` is importable and a client can be built (which
-        resolves a radio-browser API mirror)."""
-        try:
-            return self.rb is not None
-        except Exception:
-            LOG.exception("pyradios / radio-browser not reachable")
-            return False
-
-    def search(self, signals: Signals, lang: str = "en-us") -> List[Release]:
+    def search(self, signals: Signals, lang: str = "en-us", *,
+               supported_playback_types: Optional[Set[str]] = None,
+               blocked_genres: Optional[Set[str]] = None,
+               region: Optional[str] = None,
+               session_id: Optional[str] = None) -> List[Release]:
         """Search radio-browser for ``signals.title`` and return Releases.
 
         Queries by station name; if ``signals`` carry genre/content tags those
         are passed through as a radio-browser ``tag_list`` filter. Each station
         dict is mapped to a :class:`mediavocab.Release` via
-        :func:`station_to_release`.
+        :func:`station_to_release`. Returns ``[]`` when the request carries
+        neither a title nor genres, or when the radio-browser API is
+        unreachable.
         """
         query = (signals.title or "").strip()
         tags = [str(g).strip() for g in (signals.content_genres or []) if str(g).strip()]

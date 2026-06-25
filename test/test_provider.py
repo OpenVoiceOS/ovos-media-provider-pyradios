@@ -1,8 +1,7 @@
 """Tests for the pyradios MediaProvider plugin (network-free)."""
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 from mediavocab import MediaType, Release, Signals, Work
-from mediavocab.taxonomy import PlaybackType
 
 from ovos_media_provider_pyradios import (
     PyRadiosMediaProvider,
@@ -29,33 +28,6 @@ SAMPLE_STATION = {
 def test_instantiation():
     provider = PyRadiosMediaProvider()
     assert provider.name == "pyradios"
-
-
-def test_routing_class_sets():
-    assert PyRadiosMediaProvider.media == {MediaType.RADIO}
-    assert PyRadiosMediaProvider.playback_type == {PlaybackType.AUDIO}
-
-
-def test_matches_radio_true():
-    provider = PyRadiosMediaProvider()
-    assert provider.matches(Signals(medium=MediaType.RADIO)) is True
-
-
-def test_matches_movie_false():
-    provider = PyRadiosMediaProvider()
-    assert provider.matches(Signals(medium=MediaType.MOVIE)) is False
-
-
-def test_is_available_true_when_client_builds():
-    provider = PyRadiosMediaProvider()
-    with patch("pyradios.RadioBrowser", return_value=MagicMock()):
-        assert provider.is_available() is True
-
-
-def test_is_available_false_on_error():
-    provider = PyRadiosMediaProvider()
-    with patch("pyradios.RadioBrowser", side_effect=RuntimeError("no mirror")):
-        assert provider.is_available() is False
 
 
 def test_station_to_release_builds_valid_release():
