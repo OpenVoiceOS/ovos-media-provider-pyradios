@@ -24,6 +24,9 @@ dependencies = [
     "mediavocab>=1.0.0",
     "ovos-plugin-manager>=2.7.0a1,<3.0.0",
     "pyradios>=2.0.0",
+    # transitive via pyradios; the 1.0 dev prereleases that prerelease-allowing
+    # resolvers pick up break the 0.x API and ship unparseable license metadata
+    "httpx<1",
 ]
 
 [project.optional-dependencies]
