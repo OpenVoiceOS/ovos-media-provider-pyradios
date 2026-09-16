@@ -44,11 +44,10 @@ a title nor genres, or when the radio-browser API is unreachable.
 
 ## Routing
 
-| Axis | Value |
-|------|-------|
-| `media` | `RADIO` |
-| `playback_type` | `AUDIO` |
-| `genre_filter` | *(none)* |
+There is no declarative routing table. OCP calls every installed provider's `search()`
+method for each query; a provider that cannot serve the query (no title or genre tags in
+the request, no matching stations, an unreachable radio-browser API) just returns an
+empty list.
 
 ## Entry point
 
@@ -68,7 +67,7 @@ pyradios = "ovos_media_provider_pyradios:PyRadiosMediaProvider"
 - [`ovos-plugin-manager`](https://github.com/OpenVoiceOS/ovos-plugin-manager): loads and gates MediaProvider plugins for the OCP pipeline.
 - [`mediavocab`](https://github.com/TigreGotico/mediavocab): defines the `Work`/`Release`/`Signals` types this plugin builds and consumes.
 - [`ovos-skill-pyradios`](https://github.com/OpenVoiceOS/ovos-skill-pyradios): the deprecated OCP search skill this plugin replaces.
-- [`ovos-media-provider-somafm`](https://github.com/OpenVoiceOS/ovos-media-provider-somafm), [`ovos-media-provider-tunein`](https://github.com/OpenVoiceOS/ovos-media-provider-tunein), [`ovos-media-provider-radio-tuga`](https://github.com/OpenVoiceOS/ovos-media-provider-radio-tuga), [`ovos-media-provider-radio-spain`](https://github.com/OpenVoiceOS/ovos-media-provider-radio-spain): sibling radio MediaProvider plugins.
+- [`ovos-media-provider-somafm`](https://github.com/OpenVoiceOS/ovos-media-provider-somafm), [`ovos-media-provider-tunein`](https://github.com/OpenVoiceOS/ovos-media-provider-tunein), [`ovos-media-provider-radio-tuga`](https://github.com/TigreGotico/ovos-media-provider-radio-tuga), [`ovos-media-provider-radio-spain`](https://github.com/TigreGotico/ovos-media-provider-radio-spain): sibling radio MediaProvider plugins.
 
 ## License
 
