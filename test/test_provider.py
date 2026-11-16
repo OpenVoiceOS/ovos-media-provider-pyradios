@@ -45,6 +45,17 @@ def test_station_to_release_builds_valid_release():
     assert 0.0 <= rel.match_confidence <= 1.0
 
 
+def test_station_to_release_without_language_codec_or_bitrate():
+    # radio-browser leaves these empty (bitrate 0) for many stations
+    station = dict(SAMPLE_STATION, language="", codec="", bitrate=0, countrycode="")
+    rel = station_to_release(station)
+    assert isinstance(rel, Release)
+    assert rel.work.language == ""
+    assert rel.work.broadcaster_country == ""
+    assert rel.codec == ""
+    assert rel.bitrate == ""
+
+
 def test_station_to_release_skips_unplayable():
     assert station_to_release({"name": "no url"}) is None
     assert station_to_release({"url": "http://x"}) is None
