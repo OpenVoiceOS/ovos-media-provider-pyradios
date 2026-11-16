@@ -48,8 +48,10 @@ def station_to_release(station: dict) -> Optional[Release]:
     else:
         tags = [t.strip().lower() for t in str(raw_tags).split(",") if t.strip()]
 
-    language = (station.get("language") or "").strip() or None
-    country = (station.get("countrycode") or "").strip() or None
+    # mediavocab's text fields are strings, "" when unknown (None is refused);
+    # radio-browser leaves language empty for many stations
+    language = (station.get("language") or "").strip()
+    country = (station.get("countrycode") or "").strip()
 
     external_ids: dict = {}
     if station.get("stationuuid"):
@@ -64,20 +66,21 @@ def station_to_release(station: dict) -> Optional[Release]:
         external_ids=dict(external_ids),
     )
 
-    bitrate = None
+    bitrate = ""
     raw_bitrate = station.get("bitrate")
     if raw_bitrate:
         try:
-            # mediavocab's Release.bitrate is a free-form string (e.g. "128")
-            bitrate = str(int(raw_bitrate)) if int(raw_bitrate) else None
+            # mediavocab's Release.bitrate is a free-form string (e.g. "128");
+            # radio-browser reports 0 when it does not know
+            bitrate = str(int(raw_bitrate)) if int(raw_bitrate) else ""
         except (TypeError, ValueError):
-            bitrate = str(raw_bitrate).strip() or None
+            bitrate = str(raw_bitrate).strip()
 
     return Release(
         work=work,
         uri=uri,
         image=(station.get("favicon") or "").strip(),
-        codec=(station.get("codec") or "").strip() or None,
+        codec=(station.get("codec") or "").strip(),
         bitrate=bitrate,
         platform="radio-browser",
         match_confidence=_station_confidence(station),
