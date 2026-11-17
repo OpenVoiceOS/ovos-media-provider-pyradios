@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.0.1a6](https://github.com/OpenVoiceOS/ovos-media-provider-pyradios/tree/0.0.1a6) (2026-11-17)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-media-provider-pyradios/compare/0.0.1a5...0.0.1a6)
+
+**Merged pull requests:**
+
+- fix: keep stations without a language, codec or bitrate [\#7](https://github.com/OpenVoiceOS/ovos-media-provider-pyradios/pull/7) ([andlo](https://github.com/andlo))
+
 ## [0.0.1a5](https://github.com/OpenVoiceOS/ovos-media-provider-pyradios/tree/0.0.1a5) (2026-09-16)
 
 [Full Changelog](https://github.com/OpenVoiceOS/ovos-media-provider-pyradios/compare/0.0.1a4...0.0.1a5)
